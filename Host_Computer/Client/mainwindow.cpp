@@ -18,13 +18,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /*初始化界面*/
     //地址和端口自动补全以及默认提示
     QStringList hostWordList, portWordList;
-    hostWordList << tr("192.168.1.1");
+    hostWordList << tr("192.168.1.2");
     portWordList << tr("5000");
     QCompleter* completerHost = new QCompleter(hostWordList, this);
     QCompleter* completerPort = new QCompleter(portWordList, this);
     ui->hostLineEdit_2->setCompleter(completerHost);
     ui->portLineEdit_2->setCompleter(completerPort);
-    ui->hostLineEdit_2->setPlaceholderText(tr("192.168.1.1"));
+    ui->hostLineEdit_2->setPlaceholderText(tr("192.168.1.2"));
     ui->portLineEdit_2->setPlaceholderText(tr("5000"));
     //定义一个client对象，ClientStuff类（继承自QObject）,来自clientStuff
     client = new ClientStuff(host,port);
@@ -73,7 +73,6 @@ void MainWindow::setStatus(bool newStatus)
 void MainWindow::receivedSomething(QString msg)
 {
     //定义正则网页匹配对象re与正则音乐匹配对象re_music，分别表示两种正则表达规则
-    //QRegularExpression re("http[s]{0,1}://[\\w.]*\\w+[/\\w+]*");//网页正则
     QRegularExpression re("(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");//网页正则
     QRegularExpression re_music(".*\\.(?i)wav");//音乐正则
     //定义时间currentTime并给时间赋值，在客户端接收端上以时分秒的形式附加在信息前面
@@ -95,16 +94,10 @@ void MainWindow::receivedSomething(QString msg)
         //如果match成功，弹窗,根据是否按钮，如果按了是，由默认浏览器打开网址；如果按了否，什么都不执行
         if( match.hasMatch() )
         {
-            foreach(auto m, match.capturedTexts())
-            {
-                qDebug()<< " matched.captured     : " << m;
-                qDebug()<< " matched.captured     : " << match.capturedTexts();
                 if(QMessageBox::Yes == QMessageBox::information(this,tr("是否打开此网页"),strbuff,QMessageBox::Yes|QMessageBox::No))
                 {
                     QDesktopServices::openUrl(QUrl(strbuff));
                 }
-
-            }
         }
 
         //把re.music规则是否适用于strbuff的结果传给match_music
@@ -112,33 +105,21 @@ void MainWindow::receivedSomething(QString msg)
         //如果match成功，弹窗,根据是否按钮，如果按了是，给服务器发送play；如果按了否，什么都不执行
         if( match_music.hasMatch() )
         {
-            foreach(auto m, match_music.capturedTexts())
-            {
-                qDebug()<< " match_music.captured     : " << m;
                 if(QMessageBox::Yes == QMessageBox::information(this,tr("是否播放此音乐"),strbuff,QMessageBox::Yes|QMessageBox::No))
                 {
-                    QByteArray arrBlock;
-                    QDataStream out(&arrBlock, QIODevice::WriteOnly);
-                    QString in;
-                    in = "play";//发送播放指令
-                    qDebug()<<in;
-                    std::string str = in.toStdString();
-                    const char* ch = str.c_str();
-                    out.writeRawData(ch,in.length());
-                    //通过tcpSocket write arrBlock里的play
-                    client->tcpSocket->write(arrBlock);
+                    QString sendMsg = "play";
+                    client->tcpSocket->write(sendMsg.toUtf8());
                 }
-
-            }
         }
     }
 }
 
 
-void MainWindow::gotError(QAbstractSocket::SocketError err)     //连接中发生错误的槽函数处理
+void MainWindow::gotError(QAbstractSocket::SocketError err)     //连接中发生错误的槽函数处理,err为传出参数
 {
-    //qDebug() << "got error";
-    QString strError = "unknown";
+    qDebug() << "got error";
+
+    QString strError = "unknown error";
     switch (err)
     {
         case 0:

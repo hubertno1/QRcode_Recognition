@@ -1,0 +1,15 @@
+generated/objs/main.o
+generated/objs/mainwindow.o
+generated/objs/clientStuff.o
+generated/objs/bitstream.o
+generated/objs/mask.o
+generated/objs/mmask.o
+generated/objs/mqrspec.o
+generated/objs/qrencode.o
+generated/objs/qrinput.o
+generated/objs/qrspec.o
+generated/objs/rscode.o
+generated/objs/split.o
+generated/objs/moc_mainwindow.o
+generated/objs/moc_clientStuff.o
+generated/objs/moc_qrcode.o
