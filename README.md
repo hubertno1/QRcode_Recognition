@@ -1,2 +1,2 @@
 # QRcode_Recognition
-embedded Linux; QR code; RISC-V
+这是一个在RISC-V架构下的开发板上开发的QR码识别工程
