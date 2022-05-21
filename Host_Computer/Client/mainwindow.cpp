@@ -90,15 +90,16 @@ void MainWindow::receivedSomething(QString msg)
     if(strbuff.length()>10&&Popup_function==1)
     {
         //把re正则是否适用于strbuff的结果传给match
-        QRegularExpressionMatch match=re.match(strbuff);
-        //如果match成功，弹窗,根据是否按钮，如果按了是，由默认浏览器打开网址；如果按了否，什么都不执行
-        if( match.hasMatch() )
-        {
-                if(QMessageBox::Yes == QMessageBox::information(this,tr("是否打开此网页"),strbuff,QMessageBox::Yes|QMessageBox::No))
+        QRegularExpressionMatchIterator iter = re.globalMatch(strbuff);
+            while (iter.hasNext())
+            {
+                QRegularExpressionMatch match = iter.next();
+                qDebug() << match.captured(0);
+                if(QMessageBox::Yes == QMessageBox::information(this,tr("是否打开此网页"),match.captured(0),QMessageBox::Yes|QMessageBox::No))
                 {
-                    QDesktopServices::openUrl(QUrl(strbuff));
+                    QDesktopServices::openUrl(QUrl(match.captured(0)));
                 }
-        }
+            }
 
         //把re.music规则是否适用于strbuff的结果传给match_music
         QRegularExpressionMatch match_music=re_music.match(strbuff);
